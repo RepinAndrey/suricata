@@ -1,50 +1,69 @@
-# Домашнее задание к занятию "`Защита хоста`" - `Репин Андрей`
+# Домашнее задание к занятию "`Защита сети`" - `Репин Андрей`
 
 
 ### Задание 1
 
-1. Установите eCryptfs.
-2. Добавьте пользователя cryptouser.
+Проведите разведку системы и определите, какие сетевые службы запущены на защищаемой системе:
 
-![img](https://github.com/RepinAndrey/HostProtection/blob/main/img/AddCryptouser.png)
+Suricata работал везде, кроме запроса -sA. В остальных же случаях лог Suricata выдает 
+"Потенциально опасный трафик" и "Возможна утечка информации".
 
-3. Зашифруйте домашний каталог пользователя с помощью eCryptfs.
+Fail2Ban во всех случаях молчал
 
-![img](https://github.com/RepinAndrey/HostProtection/blob/main/img/CryptHome.png)
+sudo nmap -sA < ip-адрес >
 
+![img](https://github.com/RepinAndrey/suricata/blob/main/img/nmap -sA.jpg)
+
+sudo nmap -sT < ip-адрес >
+
+![img](https://github.com/RepinAndrey/suricata/blob/main/img/nmap -sT.jpg)
+
+![img](https://github.com/RepinAndrey/suricata/blob/main/img/nmap -sT suricata.jpg)
+
+sudo nmap -sS < ip-адрес >
+
+
+![img](https://github.com/RepinAndrey/suricata/blob/main/img/nmap -sS.jpg)
+
+![img](https://github.com/RepinAndrey/suricata/blob/main/img/nmap -sS suricata.jpg)
+
+sudo nmap -sV < ip-адрес >
+
+![img](https://github.com/RepinAndrey/suricata/blob/main/img/nmap -sV.jpg)
+
+![img](https://github.com/RepinAndrey/suricata/blob/main/img/nmap -sV suricata.jpg)
+
+В качестве ответа пришлите события, которые попали в логи Suricata и Fail2Ban, прокомментируйте результат.
 
 ### Задание 2
 
-1. Установите поддержку LUKS.
+Проведите атаку на подбор пароля для службы SSH:
 
-![img](https://github.com/RepinAndrey/HostProtection/blob/main/img/CryptSetup.png)
+hydra -L users.txt -P pass.txt < ip-адрес > ssh
 
+Настройка hydra:
+создайте два файла: users.txt и pass.txt;
+в каждой строчке первого файла должны быть имена пользователей, второго — пароли. В нашем случае это могут быть случайные строки, но ради эксперимента можете добавить имя и пароль существующего пользователя.
+Дополнительная информация по hydra: https://kali.tools/?p=1847.
 
-2. Создайте небольшой раздел, например, 100 Мб.
+Включение защиты SSH для Fail2Ban:
+открыть файл /etc/fail2ban/jail.conf,
+найти секцию ssh,
+установить enabled в true.
+Дополнительная информация по Fail2Ban:https://putty.org.ru/articles/fail2ban-ssh.html.
 
-![img](https://github.com/RepinAndrey/HostProtection/blob/main/img/disk.png)
+В качестве ответа пришлите события, которые попали в логи Suricata и Fail2Ban, прокомментируйте результат.
 
-3. Зашифруйте созданный раздел с помощью LUKS.
+Подбор пароля по ssh
 
-Подготовка раздела
+![img](https://github.com/RepinAndrey/suricata/blob/main/img/hydra attack.jpg)
 
-![img](https://github.com/RepinAndrey/HostProtection/blob/main/img/Prepare.png)
+log fail2ban. После исчерпания попыток входа, узел попал в Бан.
 
-Монтирование раздела
+![img](https://github.com/RepinAndrey/suricata/blob/main/img/fail2ban log.jpg)
 
-![img](https://github.com/RepinAndrey/HostProtection/blob/main/img/Mount.png)
+Suricata не отзывалась на подбор паролей по ssh. Однако, отзывалась на подбор паролей MySql.
+Видимо потому, что доступ по ssh между узлами не настроен
 
-Форматирование раздела
-
-![img](https://github.com/RepinAndrey/HostProtection/blob/main/img/Format.png)
-
-МОнтирование "открытого раздела"
-
-![img](https://github.com/RepinAndrey/HostProtection/blob/main/img/MountSecret.png)
-
-Завершение работы
-
-![img](https://github.com/RepinAndrey/HostProtection/blob/main/img/Umount.png)
-
-
+![img](https://github.com/RepinAndrey/suricata/blob/main/img/suricata fail2ban.jpg)
 
